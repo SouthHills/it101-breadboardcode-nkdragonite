@@ -1,7 +1,7 @@
 # Description : Control LED with Photoresistor
 from pathlib import Path
 import sys
-from gpiozero import PWMLED
+from gpiozero import LEDBarGraph
 import time
 
 HERE = Path(__file__).parent.parent
@@ -10,7 +10,7 @@ from ADCDevice import *
 
 USING_GRAVITECH_ADC = False # Only modify this if you are using a Gravitech ADC
 
-LED = PWMLED(17)
+LED = LEDBarGraph( 23, 24, 25, 12, 16, 20, 21, 13, 19, 18)
 ADC = ADCDevice() # Define an ADCDevice class object
 
 def setup():
@@ -31,10 +31,18 @@ def loop():
     global ADC, LED
     while True:
         value = ADC.analogRead(0)   # read the ADC value of channel 0
-        LED.value = value / 255.0   # Mapping to PWM duty cycle        
+        for i in range(1, 10):
+            if 255/10 * i > value:
+                LED[i-1].on()
+            else:
+                LED[i-1].off()
+            
+        #LED.value = value / 255.0   # Mapping to PWM duty cycle        
         voltage = value / 255.0 * 3.3
         print (f'ADC Value: {value} \tVoltage: {voltage:.2f} \tLED Value: {LED.value:.2f}')
         time.sleep(0.01)
+            
+        
         
 
 def destroy():
